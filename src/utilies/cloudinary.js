@@ -1,0 +1,32 @@
+import {v2 as cloudinary} from 'cloudinary';
+import  fs from "fs"; // this is a  node.js module in node for file write read and delecte ,etc.
+          
+cloudinary.config({ 
+  cloud_name: 'process.env.CLOUDINAY_NAME', 
+  api_key: 'process.env.CLOUDINARY_API_KEY', 
+  api_secret: 'process.env.CLOUDINARY_API_SECRET' 
+});
+
+//function for uploading files on server and unlink from server after uploading files in CLOUDINARY.
+const uploadOnCloudinary = async (localFilePath) =>{
+  try {
+    if(!localFilePath) return null;
+    //files upload on cloudinary
+     const responce=await cloudinary.uploader.upload(localFilePath,{
+      resource_type:"auto"
+    })
+    console.log("file is uploaded successfully",responce.url);
+    return responce.url;
+  } 
+  catch (error) {
+    fs.unlinkSync(localFilePath); //delete the local image which we are trying to upload .
+    console.log("files not uploaded on cloudinary", error);
+    return null;
+  }
+}
+
+
+//  uploads image to the server using clodinary
+cloudinary.uploader.upload("https://upload.wikimedia.org/wikipedia/commons/a/ae/Olympic_flag.jpg",
+  { public_id: "olympic_flag" }, 
+  function(error, result) {console.log(result); });
