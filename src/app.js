@@ -12,6 +12,15 @@ app.use(express.json({limit:"500kb"}))
 app.use(express.urlencoded({extended:true}))
 app.use(express.static("public"))
 
+
+//import router
+import userRouter from "./routes/user.router.js";
+// route declartion 
+app.use("/api/v1/users",userRouter)
+
+
+
+
 // cookies configurations
 app.use(cookieParser())
 
