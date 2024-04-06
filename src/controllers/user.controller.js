@@ -1,8 +1,8 @@
 import { asyncHandler } from "../utilies/asyncHandler.js";
-import {ApiError} from "../utilies/ApiError.js"
-import {User} from "../models/userModel.js";
-import {upuploadOnCloudinaryl} from "../utilies/cloudinary.js"
-import {ApiResponse} from "../utilies/apiResponce.js"
+import {ApiError} from "../utilies/ApiError.js";
+import {User} from "../models/user.model.js";
+import {uploadOnCloudinary} from "../utilies/cloudinary.js";
+import {ApiResponse} from "../utilies/apiResponce.js";
 
 const registerUser= asyncHandler(async (req,res)=>{
      // get user details from frontend
@@ -15,7 +15,7 @@ const registerUser= asyncHandler(async (req,res)=>{
     // check for user creation
     // return res
     const {fullName, username, email, password}=req.body //req.body get data from  form or json
-    console.log("email",email, "username",username);
+    console.log("email", email, "username", username,);
 //     if (fullName ==="") {
 //         throw new ApiError(400,"fullname is required")
 //     }
@@ -24,7 +24,7 @@ const registerUser= asyncHandler(async (req,res)=>{
         }
 
         //already existed user can check from "users" due users creates with mongoose
-        const existedUser=User.findOne({$or:[{email}, {username}]})
+        const existedUser= await User.findOne({$or:[{email}, {username}]})
         if (existedUser) {
                 throw new ApiError(409,"User  Already Exists! Please Login Instead.")
         };
@@ -32,14 +32,15 @@ const registerUser= asyncHandler(async (req,res)=>{
         //files uploading with  multer "files" and express req
         const avatarLocalPath=req.files?.avatar[0]?.path;   //multer gives path of uploaded file
         console.log(req.files);
+        console.log(avatarLocalPath);
         const coverImageLocalPath=req.files?.coverImage[0]?.path;
         if (!avatarLocalPath) {
-                throw new ApiError(400,"avatar is required")
+                throw new ApiError(400,"avatarLocalfile is required")
         }
         
         //files upload om cloudinary
-        const avatar=await upuploadOnCloudinaryl(avatarLocalPath)
-        const coverImage=await upuploadOnCloudinaryl(coverImageLocalPath)
+        const avatar=await uploadOnCloudinary(avatarLocalPath);
+        const coverImage=await uploadOnCloudinary(coverImageLocalPath);
         if (!avatar) {
                 throw new ApiError(400,"avatar is required")
         }
@@ -47,7 +48,7 @@ const registerUser= asyncHandler(async (req,res)=>{
         // data upload on dataBase 
         const user= await User.create({
                 fullName,
-                avatar: avatar.url,
+                avatar,
                 coverImage:coverImage.url || "",
                 email,
                 username:username.toLowerCase(),
