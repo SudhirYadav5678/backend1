@@ -8,7 +8,7 @@ app.use(cors({
     Credential:true,
 }))
 // configuration for accepting  json data in request body and url
-app.use(express.json({limit:"500kb"}))
+app.use(express.json({limit:"5000kb"}))
 app.use(express.urlencoded({extended:true}))
 app.use(express.static("public"))
 
